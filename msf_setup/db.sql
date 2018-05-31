@@ -9,5 +9,4 @@ update pg_database set datallowconn = FALSE where datname = 'template0';
 create user msf;
 alter user msf with encrypted password 'N0m0r3s3cr3ts?';
 alter user msf CREATEDB;
-
 \q
