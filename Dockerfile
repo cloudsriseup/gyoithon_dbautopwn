@@ -1,20 +1,18 @@
 FROM kalilinux/kali-linux-docker
 
-RUN apt-get update && apt-get install -y metasploit-framework tmux
+RUN apt-get update && apt-get install -y metasploit-framework tmux python3-pandas python3-docopt python3-msgpack python3-jinja2 && apt-get clean && rm -rf /var/lib/apt/lists/*
 
+##Setup MSF
 RUN curl -sSL https://github.com/cloudsriseup/gyoithon_dbautopwn/raw/master/msf_setup/db.sql --output /tmp/db.sql
 RUN /etc/init.d/postgresql start && su postgres -c "psql -f /tmp/db.sql"
 RUN curl -sSL https://github.com/cloudsriseup/gyoithon_dbautopwn/raw/master/msf_setup/database.yml --output /usr/share/metasploit-framework/config/database.yml
 
+#Setup Gyoithon
 RUN git clone https://github.com/gyoisamurai/GyoiThon /opt/gyiothon
-
-RUN apt-get install -y python3-pandas python3-docopt python3-msgpack python3-jinja2 vim
-
 RUN curl -sSL https://github.com/cloudsriseup/gyoithon_dbautopwn/raw/master/msf_setup/meterpreter.rc --output /tmp/meterpreter.rc
+RUN curl -sSL https://github.com/cloudsriseup/gyoithon_dbautopwn/raw/master/gyoithon_setup/config.ini --output /opt/gyiothon/classifier4gyoithon/config.ini
 
-RUN curl -sSL https://github.com/cloudsriseup/gyoithon_dbautopwn/raw/master/gyoithon_setup/config.ini --output /tmp/config.ini
-RUN mv /tmp/config.ini /opt/gyiothon/classifier4gyoithon/
-
+##Clean up a few things broken in the code due to suboptimal development
 RUN find /opt/gyiothon -name "*.py" -type f | xargs sed -i -e '/OKGREEN + banner + ENDC/d'
 
 WORKDIR "/opt/gyiothon/"
